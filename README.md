@@ -1,49 +1,27 @@
-# TourAssist
+# Auditable System-Understanding Diagrams
 
-TourAssist is a multi-tenant, text-based AI tourist assistant with tenant-scoped RAG, evaluation harness, and observability.
+Build a deterministic “agentic” workflow that turns an existing codebase + docs into **auditable architecture diagrams**.
 
-## Quick start
+The core principle is strict authority:
 
-```bash
-cd tourassist
-make install
-make run
-```
+- **CAM (Canonical Architecture Model)** is the only source of architectural truth.
+- **Diagrams are views** compiled from CAM (never edited directly to change architecture).
+- **Architecture Deltas (ADs)** are explicit, validated proposals (from chat, diagram edit events, bootstrap, or static analysis) and are **applied only with explicit approval**.
 
-### Create a tenant
+## Status
 
-```bash
-curl -X POST http://localhost:8000/tenants \
-  -H "Content-Type: application/json" \
-  -d '{"tenant_id": "demo"}'
-```
+This repo is under active development. The project roadmap and acceptance criteria live in:
 
-### Ingest a demo document
+- `specs/highlevel_plan.md`
+- `specs/plan.md`
+- `specs/tasks.md`
+- `specs/agentic_ai_workflow.md`
 
-```bash
-curl -X POST http://localhost:8000/ingest \
-  -H "X-API-Key: <api_key>" \
-  -F tenant_id=demo \
-  -F file=@data/demo/spa.md
-```
+## What “auditable” means here
 
-### Chat
+Every CAM node/edge is expected to carry **evidence** (e.g., file paths + line ranges, doc headings + line ranges), and outputs are intended to be **deterministic** for the same inputs (stable ordering, stable serialization).
 
-```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: <api_key>" \
-  -d '{"tenant_id": "demo", "session_id": "session-1", "user_message": "What time does the spa open on Sundays?"}'
-```
+## Development
 
-### Run evaluation
+- Run tests: `pytest`
 
-```bash
-make eval
-```
-
-## Docker
-
-```bash
-docker-compose up --build
-```
