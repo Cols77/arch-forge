@@ -1,0 +1,33 @@
+﻿graph TD
+  Start["Start / resume run\nload CAM + rules + policy + overrides + state"]
+
+  subgraph Origins[Delta origins - proposals only]
+    Chat["User chat prompt"] --> CandAD
+    Edit["Diagram edits (typed events)"] --> CandAD
+    Analysis["Automated analysis\n(docs ingest + code grounding)"] --> CandAD
+    Bootstrap["Bootstrap agent\n(nodes-only proposal)"] --> CandAD
+    TreeSitter["Tree-sitter analysis\n(edges-only proposal)"] --> CandAD
+  end
+
+  Start --> CandAD["Candidate Architecture Delta - AD"]
+
+  CandAD --> Validate["Validate AD\nstructure + archetype rules + CAM invariants + rule DSL + policy + overrides"]
+
+  Validate -->|needs_clarification| Clarify["Ask blocking questions\nand revise AD"] --> CandAD
+  Validate -->|invalid| Repair["Revise AD\nand re-validate"] --> CandAD
+
+  Validate -->|valid| Approval["Approval gate\nApply delta"]
+  Approval -->|approved| Apply["Apply AD to CAM\nappend cam/deltas/*; update cam/cam.json"]
+  Approval -->|rejected| Rejected["Record rejection\nno CAM change"]
+
+  Apply --> Views["Compile views from CAM only\nMermaid + DOT; non-authoritative"]
+
+  Apply --> ExecPlan["Derive execution plan\nschema-validated; CAM mutation forbidden"]
+  ExecPlan -->|user approves execution| Execute["Execution agents modify code only"]
+  Execute --> Evidence["Post-exec grounding\n+ evidence capture"]
+  Evidence --> StatusAD["Follow-up AD\nstatus and lifecycle transitions"] --> Validate
+
+  Apply --> Workflow["Validate workflow slice\nrecord validated workflows"]
+  Workflow --> WCount{Workflows at least 10}
+  WCount -->|no| Loop["Continue - more proposals"] --> CandAD
+  WCount -->|yes| Stop["Stop exploration\npolicy-enforced termination"]

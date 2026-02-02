@@ -7,6 +7,10 @@ __pycache__/
 tourassist/eval_output/
 tourassist/data/tourassist.db
 
+# Legacy project (do not reintroduce into this repo)
+visitor-assistant/
+visitor_assistant/
+
 # C extensions
 *.so
 
